@@ -28,6 +28,8 @@ request.get(apiUrl, (error, response, body) => {
     return;
   }
 
+  console.log('Films:', films);
+
   if (!Array.isArray(films)) {
     console.error('Unexpected API response format');
     return;
