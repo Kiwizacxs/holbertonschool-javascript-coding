@@ -12,7 +12,7 @@ if (!url || !filePath) {
 }
 
 request.get({
-  url: url,
+  url,
   encoding: 'utf-8'
 }, (error, response, body) => {
   if (error) {
@@ -28,7 +28,6 @@ request.get({
   fs.writeFile(filePath, body, 'utf-8', (err) => {
     if (err) {
       console.error('Error writing file:', err);
-      return;
     }
   });
 });
