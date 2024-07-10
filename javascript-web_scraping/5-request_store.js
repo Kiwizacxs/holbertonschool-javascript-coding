@@ -7,16 +7,16 @@ request(apiUrl, function (error, response, body) {
   if (error) {
     console.error(error);
   }
-  const all = JSON.parse(body);
-  const result = {};
-  all.forEach(function (todo) {
+  const todos = JSON.parse(body);
+  const completeTasks = {};
+  todos.forEach(function (todo) {
     if (todo.completed) {
-      if (result[todo.userId]) {
-        result[todo.userId] += 1;
+      if (completeTasks[todo.userId]) {
+        completeTasks[todo.userId] += 1;
       } else {
-        result[todo.userId] = 1;
+        completeTasks[todo.userId] = 1;
       }
     }
   });
-  console.log(result);
+  console.log(completeTasks);
 });
