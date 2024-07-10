@@ -16,14 +16,21 @@ request.get(apiUrl, (error, response, body) => {
   }
 
   const films = JSON.parse(body).results;
-  const wedgeAntillesUrl = 'https://swapi-api.hbtn.io/api/people/18/';
+  const wedgeAntillesUrl = 'http://swapi-api.hbtn.io/api/people/18/';
+    
+  const wedgeAntillesUrls = [
+    'https://swapi-api.hbtn.io/api/people/18/',
+    'http://swapi-api.hbtn.io/api/people/18/',
+      'http://localhost:5050/people/18/',
+      'https://localhost:5050/people/18/'
+    ];
 
   const count = films.reduce((acc, film) => {
-    if (film.characters.includes(wedgeAntillesUrl)) {
+    if (film.characters.some(url => wedgeAntillesUrls.includes(url))) {
       acc += 1;
     }
     return acc;
   }, 0);
-
+  
   console.log(count);
 });
