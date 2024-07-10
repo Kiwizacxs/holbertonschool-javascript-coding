@@ -1,29 +1,56 @@
+/* eslint-disable */
 const express = require('express');
-const app = express();
-const fs = require('fs');
+const fs = require('fs').promises;
 
-app.use(express.text());
+function countStudents(path) {
+  return fs
+    .readFile(path, 'utf8')
+    .then((data) => {
+      const rows = data.split('\n').filter((row) => row);
+      const headers = rows.shift().split(',');
+      const fieldIndex = headers.indexOf('field');
+      const firstNameIndex = headers.indexOf('firstname');
+      const fields = [
+        ...new Set(rows.map((row) => row.split(',')[fieldIndex])),
+      ];
+
+      let result = `Number of students: ${rows.length}\n`;
+
+      fields.forEach((field) => {
+        const students = rows.filter(
+          (row) => row.split(',')[fieldIndex] === field
+        );
+        result += `Number of students in ${field}: ${
+          students.length
+        }. List: ${students
+          .map((student) => student.split(',')[firstNameIndex])
+          .join(', ')}\n`;
+      });
+      return result;
+    })
+    .catch(() => {
+      throw new Error('Cannot load the database');
+    });
+}
+
+const app = express();
+const port = 1245;
 
 app.get('/', (req, res) => {
   res.send('Hello Holberton School!');
 });
 
 app.get('/students', (req, res) => {
-  fs.readFile(process.argv[2], 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error reading file');
-    } else {
-      const students = data.split('\n').map((line) => line.split(',')).filter((student) => student[0]!== '');
-      const csStudents = students.filter((student) => student[1] === 'CS').map((student) => student[0]);
-      const sweStudents = students.filter((student) => student[1] === 'SWE').map((student) => student[0]);
-      res.send(`This is the list of our students\nNumber of students: ${students.length}\nNumber of students in CS: ${csStudents.length}. List: ${csStudents.join(', ')}\nNumber of students in SWE: ${sweStudents.length}. List: ${sweStudents.join(', ')}`);
-    }
+  countStudents(process.argv[2])
+    .then((data) => {
+      res.send(`This is the list of our students\n${data}`);
+    })
+    .catch((err) => {
+      res.send(`This is the list of our students\n${err.message}`);
+    });
+});
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
   });
-});
-
-app.listen(1245, () => {
-  console.log('Server listening on port 1245');
-});
 
 module.exports = app;
