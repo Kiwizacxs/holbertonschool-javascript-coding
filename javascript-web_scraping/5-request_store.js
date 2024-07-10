@@ -1,22 +1,35 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 
 const request = require('request');
-const apiUrl = process.argv[2];
+const fs = require('fs');
 
-request(apiUrl, function (error, response, body) {
+const url = process.argv[2];
+const filePath = process.argv[3];
+
+if (!url || !filePath) {
+  console.error('Usage: ./5-request_store.js <URL> <file-path>');
+  process.exit(1);
+}
+
+request.get({
+  url: url,
+  encoding: 'utf-8'
+}, (error, response, body) => {
   if (error) {
-    console.error(error);
+    console.error('Error:', error);
+    return;
   }
-  const todos = JSON.parse(body);
-  const completeTasks = {};
-  todos.forEach(function (todo) {
-    if (todo.completed) {
-      if (completeTasks[todo.userId]) {
-        completeTasks[todo.userId] += 1;
-      } else {
-        completeTasks[todo.userId] = 1;
-      }
+
+  if (response.statusCode !== 200) {
+    console.error(`Failed to retrieve data. Status code: ${response.statusCode}`);
+    return;
+  }
+
+  fs.writeFile(filePath, body, 'utf-8', (err) => {
+    if (err) {
+      console.error('Error writing file:', err);
+      return;
     }
+    console.log(`Successfully wrote response body to ${filePath}`);
   });
-  console.log(completeTasks);
 });
