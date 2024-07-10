@@ -1,4 +1,4 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 
 const request = require('request');
 
@@ -27,8 +27,6 @@ request.get(apiUrl, (error, response, body) => {
     console.error('Failed to parse JSON:', parseError);
     return;
   }
-
-  console.log('Films:', films);
 
   if (!Array.isArray(films)) {
     console.error('Unexpected API response format');
