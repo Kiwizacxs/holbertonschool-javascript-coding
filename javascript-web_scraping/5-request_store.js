@@ -1,32 +1,22 @@
 #!/usr/bin/node
 
 const request = require('request');
-const fs = require('fs');
+const apiUrl = process.argv[2];
 
-const url = process.argv[2];
-const filePath = process.argv[3];
-
-if (!url || !filePath) {
-  console.error('Usage: ./5-fetch_store.js <URL> <file-path>');
-  process.exit(1);
-}
-
-request.get(url, (error, response, body) => {
+request(apiUrl, function (error, response, body) {
   if (error) {
-      console.error('Error:', error);
-      return;
+    console.error(error);
   }
-
-  if (response.statusCode !== 200) {
-    console.error(`Failed to retrieve data. Status code: ${response.statusCode}`);
-    return;
-  }
-
-  fs.writeFile(filePath, body, 'utf-8', (err) => {
-    if (err) {
-      console.error('Error writing file:', err);
-      return;
+  const all = JSON.parse(body);
+  const result = {};
+  all.forEach(function (todo) {
+    if (todo.completed) {
+      if (result[todo.userId]) {
+        result[todo.userId] += 1;
+      } else {
+        result[todo.userId] = 1;
+      }
     }
-    console.log(`Successfully wrote response body to ${filePath}`);
   });
+  console.log(result);
 });
